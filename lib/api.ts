@@ -32,15 +32,15 @@ export class ApiClient {
     })
 
     if (!response.ok) {
-        // لو الرد كان 403 Forbidden يبقى ده يوزر عادي بيحاول يدخل
-        if (response.status === 403) {
-            throw { message: "Access Denied: Admins Only", status: 403 } as ApiError
-        }
-        throw { message: "Login failed", status: response.status } as ApiError
+      // لو الرد كان 403 Forbidden يبقى ده يوزر عادي بيحاول يدخل
+      if (response.status === 403) {
+        throw { message: "Access Denied: Admins Only", status: 403 } as ApiError
+      }
+      throw { message: "Login failed", status: response.status } as ApiError
     }
 
     return response.json()
-}
+  }
 
   async getProducts(): Promise<any[]> {
     const response = await fetch(`${this.baseUrl}/api/v1/store/products`, {
@@ -126,6 +126,19 @@ export class ApiClient {
 
     if (!response.ok) {
       throw { message: "Failed to update settings", status: response.status } as ApiError
+    }
+
+    return response.json()
+  }
+
+  async getAnalytics(): Promise<any> {
+    const response = await fetch(`${this.baseUrl}/api/v1/admin/analytics`, {
+      method: "GET",
+      headers: this.getAuthHeader(),
+    })
+
+    if (!response.ok) {
+      throw { message: "Failed to fetch analytics", status: response.status } as ApiError
     }
 
     return response.json()
