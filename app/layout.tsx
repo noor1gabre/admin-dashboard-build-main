@@ -12,7 +12,9 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Family & Home - Admin Dashboard",
   description: "E-commerce Admin Dashboard",
-  generator: 'v0.app'
+  icons: {
+    icon: "/family_home_logo.ico",
+  },
 }
 
 export default function RootLayout({
