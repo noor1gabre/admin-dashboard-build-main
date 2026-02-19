@@ -5,6 +5,17 @@ import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, Filter, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 interface Order {
   id: number
@@ -26,6 +37,11 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [updatingId, setUpdatingId] = useState<number | null>(null)
+
+  // Approval Modal State
+  const [approvalOpen, setApprovalOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [weight, setWeight] = useState("")
 
   const fetchOrders = async () => {
     try {
@@ -69,6 +85,45 @@ export default function OrdersPage() {
     } catch (error) {
       console.error(error)
       alert("Failed to update status")
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
+  const handleApproveClick = (order: Order) => {
+    setSelectedOrder(order)
+    setWeight("") // Reset weight
+    setApprovalOpen(true)
+  }
+
+  const handleConfirmApproval = async () => {
+    if (!selectedOrder || !weight) return;
+
+    setUpdatingId(selectedOrder.id)
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+
+      const formData = new FormData()
+      formData.append("weight", weight)
+
+      const response = await fetch(`${apiUrl}/api/v1/admin/orders/${selectedOrder.id}/approve`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error("Failed to approve order")
+
+      const updatedOrder = await response.json()
+      setOrders(orders.map(o => o.id === selectedOrder.id ? updatedOrder : o))
+      setApprovalOpen(false)
+      alert(`Order #${selectedOrder.id} Approved & Shipment Created! 🚀`)
+
+    } catch (error) {
+      console.error(error)
+      alert("Failed to approve order. Check console.")
     } finally {
       setUpdatingId(null)
     }
@@ -125,12 +180,13 @@ export default function OrdersPage() {
                   <th className="px-6 py-3">Receipt</th>
                   <th className="px-6 py-3">Date</th>
                   <th className="px-6 py-3">Status</th>
+                  <th className="px-6 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       No orders found
                     </td>
                   </tr>
@@ -167,23 +223,21 @@ export default function OrdersPage() {
                         {new Date(order.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="relative">
-                          <select
-                            value={order.status}
-                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
+                          {order.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {order.status === 'pending' && (
+                          <Button
+                            size="sm"
+                            className="bg-[#2A6F80] hover:bg-[#1f5562] text-white"
+                            onClick={() => handleApproveClick(order)}
                             disabled={updatingId === order.id}
-                            className={`appearance-none pl-3 pr-8 py-1 rounded-full text-xs font-semibold focus:outline-none cursor-pointer disabled:opacity-50 ${getStatusColor(order.status)}`}
                           >
-                            {statusOptions.map(status => (
-                              <option key={status} value={status}>
-                                {status.charAt(0).toUpperCase() + status.slice(1)}
-                              </option>
-                            ))}
-                          </select>
-                          {updatingId === order.id && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
-                          )}
-                        </div>
+                            {updatingId === order.id ? "..." : "Approve & Ship"}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -193,6 +247,54 @@ export default function OrdersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Approval Dialog */}
+      <Dialog open={approvalOpen} onOpenChange={setApprovalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Approve Order #{selectedOrder?.id}</DialogTitle>
+            <DialogDescription>
+              Review the payment receipt and enter package weight to initiate shipment.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {selectedOrder?.receipt_url && (
+              <div className="flex justify-center mb-4">
+                <a href={selectedOrder.receipt_url} target="_blank" rel="noreferrer">
+                  <img
+                    src={selectedOrder.receipt_url}
+                    alt="Receipt"
+                    className="max-h-[200px] rounded border hover:scale-105 transition-transform cursor-zoom-in"
+                  />
+                </a>
+              </div>
+            )}
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="weight" className="text-right">
+                Weight (kg)
+              </Label>
+              <Input
+                id="weight"
+                type="number"
+                step="0.1"
+                placeholder="e.g. 5.0"
+                className="col-span-3"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setApprovalOpen(false)}>Cancel</Button>
+            <Button type="button" onClick={handleConfirmApproval} disabled={!weight || updatingId !== null}>
+              {updatingId ? "Processing..." : "Confirm & Ship"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
