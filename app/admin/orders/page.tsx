@@ -116,10 +116,21 @@ export default function OrdersPage() {
 
       if (!response.ok) throw new Error("Failed to approve order")
 
-      const updatedOrder = await response.json()
+      const data = await response.json()
+      // Backend now returns { order: ..., user_whatsapp_link: ... }
+      const updatedOrder = data.order || data // Fallback for safety
+      const userWaLink = data.user_whatsapp_link
+
       setOrders(orders.map(o => o.id === selectedOrder.id ? updatedOrder : o))
       setApprovalOpen(false)
-      alert(`Order #${selectedOrder.id} Approved & Shipment Created! 🚀`)
+
+      if (userWaLink) {
+        // Open WhatsApp to notify user
+        window.open(userWaLink, '_blank')
+        alert(`Order #${selectedOrder.id} Approved & Shipped! WhatsApp opened for customer notification. 🚀`)
+      } else {
+        alert(`Order #${selectedOrder.id} Approved & Shipment Created! 🚀`)
+      }
 
     } catch (error) {
       console.error(error)
