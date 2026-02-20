@@ -199,7 +199,7 @@ export default function OrdersPage() {
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 bg-gray-50/50 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#2A6F80] tracking-tight">Orders Management</h1>
+          <h1 className="text-3xl font-extrabold text-[#2A6F80] tracking-tight">Orders Management Page</h1>
           <p className="text-gray-500 mt-1 min-w-8">Manage and track all customer orders</p>
         </div>
         <div className="relative w-full sm:w-72 shadow-sm rounded-lg">
