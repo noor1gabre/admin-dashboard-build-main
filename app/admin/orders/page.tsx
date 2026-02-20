@@ -140,6 +140,42 @@ export default function OrdersPage() {
     }
   }
 
+  const handleCancelOrder = async (orderId: number) => {
+    if (!confirm("Are you sure you want to cancel this order? It will also cancel the shipment if possible.")) return;
+
+    setUpdatingId(orderId)
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+      const response = await fetch(`${apiUrl}/api/v1/admin/orders/${orderId}/cancel`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) throw new Error("Failed to cancel order")
+
+      const data = await response.json()
+      const updatedOrder = data.order || data
+      const userWaLink = data.user_whatsapp_link
+
+      setOrders(orders.map(o => o.id === orderId ? updatedOrder : o))
+
+      if (userWaLink) {
+        window.open(userWaLink, '_blank')
+        alert(`Order #${orderId} Cancelled! WhatsApp opened for customer notification.`)
+      } else {
+        alert(`Order #${orderId} Cancelled successfully.`)
+      }
+
+    } catch (error) {
+      console.error(error)
+      alert("Failed to cancel order.")
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
   const filteredOrders = orders.filter(order =>
     order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     order.id.toString().includes(searchQuery) ||
@@ -238,7 +274,7 @@ export default function OrdersPage() {
                           {order.status.toUpperCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 flex gap-2">
                         {order.status === 'pending' && (
                           <Button
                             size="sm"
@@ -247,6 +283,16 @@ export default function OrdersPage() {
                             disabled={updatingId === order.id}
                           >
                             {updatingId === order.id ? "..." : "Approve & Ship"}
+                          </Button>
+                        )}
+                        {['pending', 'processing', 'shipped'].includes(order.status) && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleCancelOrder(order.id)}
+                            disabled={updatingId === order.id}
+                          >
+                            Cancel
                           </Button>
                         )}
                       </td>
