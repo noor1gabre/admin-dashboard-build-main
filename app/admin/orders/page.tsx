@@ -184,111 +184,140 @@ export default function OrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "pending": return "bg-yellow-100 text-yellow-800"
-      case "processing": return "bg-blue-100 text-blue-800"
-      case "shipped": return "bg-indigo-100 text-indigo-800"
-      case "delivered": return "bg-green-100 text-green-800"
-      case "cancelled": return "bg-red-100 text-red-800"
-      default: return "bg-gray-100 text-gray-800"
+      case "pending": return "bg-amber-50 text-amber-700 border-amber-200"
+      case "processing": return "bg-blue-50 text-blue-700 border-blue-200"
+      case "shipped": return "bg-indigo-50 text-indigo-700 border-indigo-200"
+      case "delivered": return "bg-emerald-50 text-emerald-700 border-emerald-200"
+      case "cancelled": return "bg-rose-50 text-rose-700 border-rose-200"
+      default: return "bg-gray-50 text-gray-700 border-gray-200"
     }
   }
 
   if (loading) return <div className="p-8 text-center">Loading orders...</div>
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold text-[#2A6F80]">Orders Management</h1>
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+    <div className="space-y-8 p-4 sm:p-6 lg:p-8 bg-gray-50/50 min-h-screen">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-[#2A6F80] tracking-tight">Orders Management</h1>
+          <p className="text-gray-500 mt-1 min-w-8">Manage and track all customer orders</p>
+        </div>
+        <div className="relative w-full sm:w-72 shadow-sm rounded-lg">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="Search orders..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2A6F80]/20"
+            placeholder="Search by ID, name, or phone..."
+            className="w-full pl-11 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2A6F80]/20 bg-white placeholder-gray-400 text-sm transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
-      <Card>
+      <Card className="border-gray-100 shadow-sm overflow-hidden rounded-xl">
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 text-gray-700 uppercase">
+              <thead className="bg-[#2A6F80]/5 text-[#2A6F80] uppercase text-xs font-bold tracking-wider border-b border-gray-100">
                 <tr>
-                  <th className="px-6 py-3">Order ID</th>
-                  <th className="px-6 py-3">Customer</th>
-                  <th className="px-6 py-3">Items</th>
-                  <th className="px-6 py-3">Total</th>
-                  <th className="px-6 py-3">Receipt</th>
-                  <th className="px-6 py-3">Date</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3">Actions</th>
+                  <th className="px-6 py-4 rounded-tl-lg">Order ID</th>
+                  <th className="px-6 py-4">Customer</th>
+                  <th className="px-6 py-4">Items</th>
+                  <th className="px-6 py-4">Total</th>
+                  <th className="px-6 py-4 text-center">Receipt</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 rounded-tr-lg text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                      No orders found
+                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500 bg-gray-50/50 rounded-b-lg">
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <Search className="h-8 w-8 text-gray-400 mb-2" />
+                        <p className="text-lg font-medium text-gray-900">No orders found</p>
+                        <p className="text-sm text-gray-500">Try adjusting your search query.</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   filteredOrders.map((order) => (
-                    <tr key={order.id} className="border-b hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-medium">#{order.id}</td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium">{order.customer_name}</div>
-                        <div className="text-xs text-gray-500">{order.customer_phone}</div>
-                        <div className="text-xs text-gray-500 max-w-[150px] truncate" title={order.customer_address}>
-                          {order.customer_address}
+                    <tr key={order.id} className="hover:bg-gray-50/80 transition-all duration-200">
+                      <td className="px-6 py-5 font-semibold text-gray-900">#{order.id}</td>
+                      <td className="px-6 py-5">
+                        <div className="font-semibold text-gray-900">{order.customer_name}</div>
+                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                          <span>📞</span> {order.customer_phone}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2 max-w-[250px] leading-relaxed bg-gray-50 p-2 rounded border border-gray-100">
+                          <span className="font-medium text-gray-700 block mb-1">Delivery Address:</span>
+                          {(() => {
+                            try {
+                              const addr = JSON.parse(order.customer_address)
+                              return `${addr.street_address || ''}, ${addr.local_area || ''}, ${addr.city || ''}, ${addr.postal_code || ''}, ${addr.province || ''}`
+                                .replace(/(^, |, $)/g, '').replace(/, ,/g, ',')
+                            } catch (e) {
+                              return order.customer_address
+                            }
+                          })()}
                         </div>
                       </td>
-                      <td className="px-6 py-4 max-w-[200px] truncate" title={order.items_summary}>
-                        {order.items_summary}
+                      <td className="px-6 py-5">
+                        <div className="max-w-[200px] text-gray-600 leading-snug">
+                          {order.items_summary.split(', ').map((item, i) => (
+                            <div key={i} className="mb-1 bg-blue-50/50 text-blue-900 px-2 py-1 rounded text-xs border border-blue-100 inline-block mr-1">
+                              {item}
+                            </div>
+                          ))}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 font-bold">
+                      <td className="px-6 py-5 text-gray-900 font-bold whitespace-nowrap">
                         R {order.total_price.toFixed(2)}
                       </td>
-                      <td className="px-6 py-4">
-                        {order.receipt_url && (
+                      <td className="px-6 py-5 text-center">
+                        {order.receipt_url ? (
                           <a
                             href={order.receipt_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#2A6F80] hover:underline flex items-center gap-1"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2A6F80]/10 text-[#2A6F80] hover:bg-[#2A6F80]/20 rounded-md transition-colors text-xs font-medium"
                           >
-                            View <ExternalLink size={12} />
+                            <ExternalLink size={14} /> View
                           </a>
+                        ) : (
+                          <span className="text-xs text-gray-400 italic">None</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
-                        {new Date(order.created_at).toLocaleDateString()}
+                      <td className="px-6 py-5 text-gray-600 whitespace-nowrap text-sm">
+                        {new Date(order.created_at).toLocaleDateString(undefined, {
+                          year: 'numeric', month: 'short', day: 'numeric'
+                        })}
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>
-                          {order.status.toUpperCase()}
+                      <td className="px-6 py-5 whitespace-nowrap">
+                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusColor(order.status)} border shadow-sm`}>
+                          {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 flex gap-2">
+                      <td className="px-6 py-5 text-right space-x-2 whitespace-nowrap">
                         {order.status === 'pending' && (
                           <Button
                             size="sm"
-                            className="bg-[#2A6F80] hover:bg-[#1f5562] text-white"
+                            className="bg-[#2A6F80] hover:bg-[#1f5562] text-white shadow-sm transition-all hover:shadow-md"
                             onClick={() => handleApproveClick(order)}
                             disabled={updatingId === order.id}
                           >
-                            {updatingId === order.id ? "..." : "Approve & Ship"}
+                            {updatingId === order.id ? "Processing..." : "Approve & Ship"}
                           </Button>
                         )}
                         {['pending', 'processing', 'shipped'].includes(order.status) && (
                           <Button
                             size="sm"
                             variant="destructive"
+                            className="shadow-sm hover:shadow-md transition-all"
                             onClick={() => handleCancelOrder(order.id)}
                             disabled={updatingId === order.id}
                           >
