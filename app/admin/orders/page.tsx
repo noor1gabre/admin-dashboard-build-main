@@ -252,7 +252,7 @@ export default function OrdersPage() {
                         {order.items_summary}
                       </td>
                       <td className="px-6 py-4 font-bold">
-                        {order.total_price.toFixed(2)} EGP
+                        R {order.total_price.toFixed(2)}
                       </td>
                       <td className="px-6 py-4">
                         {order.receipt_url && (
