@@ -79,7 +79,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <div className="w-1 h-10 rounded-full bg-gradient-to-b from-primary to-secondary" />
           <div>
             <p className="text-2xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              ${new Intl.NumberFormat('en-US').format(payload[0].value)}
+              R{new Intl.NumberFormat('en-US').format(payload[0].value)}
             </p>
             <p className="text-xs text-primary font-semibold mt-0.5">Revenue</p>
           </div>
@@ -174,7 +174,7 @@ export default function PremiumAnalyticsDashboard() {
               </div>
             </div>
 
-        
+
           </div>
         </div>
 
@@ -216,8 +216,8 @@ export default function PremiumAnalyticsDashboard() {
 
                     <div className="flex items-center gap-3">
                       <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border ${isUp
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                          : 'bg-rose-50 text-rose-700 border-rose-100'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                        : 'bg-rose-50 text-rose-700 border-rose-100'
                         }`}>
                         {isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                         {kpi.trend}
@@ -273,7 +273,7 @@ export default function PremiumAnalyticsDashboard() {
                       fontSize={12}
                       tickLine={false}
                       axisLine={false}
-                      tickFormatter={(value) => `$${value > 0 ? (value / 1000).toFixed(1) : 0}k`}
+                      tickFormatter={(value) => `R${value > 0 ? (value / 1000).toFixed(1) : 0}k`}
                       dx={-10}
                       fontWeight={500}
                     />
@@ -360,12 +360,12 @@ export default function PremiumAnalyticsDashboard() {
               <CardTitle className="text-xl font-bold text-foreground">Recent Transactions</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">Latest customer orders & activity</p>
             </div>
-            <Link 
-    href="/admin/orders" 
-    className="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider flex items-center gap-1"
-  >
-    View All <ArrowUpRight size={14} />
-  </Link>
+            <Link
+              href="/admin/orders"
+              className="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider flex items-center gap-1"
+            >
+              View All <ArrowUpRight size={14} />
+            </Link>
           </CardHeader>
 
           <CardContent className="p-0">
@@ -404,10 +404,10 @@ export default function PremiumAnalyticsDashboard() {
                       </td>
                       <td className="px-8 py-5 text-right">
                         <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-[10px] font-bold border uppercase tracking-wide ${order.status === "Delivered"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                            : order.status === "Processing"
-                              ? "bg-secondary/10 text-secondary border-secondary/20"
-                              : "bg-slate-50 text-slate-600 border-slate-100"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                          : order.status === "Processing"
+                            ? "bg-secondary/10 text-secondary border-secondary/20"
+                            : "bg-slate-50 text-slate-600 border-slate-100"
                           }`}>
                           {order.status}
                         </span>

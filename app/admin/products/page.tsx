@@ -136,7 +136,7 @@ export default function ProductsPage() {
                 )}
 
                 <div className="flex items-center justify-between pt-2">
-                  <span className="text-2xl font-bold text-[#2A6F80]">${product.price.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-[#2A6F80]">R {product.price.toFixed(2)}</span>
                 </div>
 
                 {/* Actions */}
